@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChokroAI</title>
+    <!-- Favicons -->
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="icon" href="favicon.ico">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #c3cfe2 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 20px;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 1000px;
+            height: 100vh;
+            background: #f8f9fa;
+            border-radius: 0;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .auth-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #006A4E;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .tagline {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        input[type="email"], input[type="password"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        input[type="email"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #006A4E;
+            background: white;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 106, 78, 0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #006A4E 0%, #00A651 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 106, 78, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .toggle-auth {
+            color: #006A4E;
+            cursor: pointer;
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .toggle-auth:hover {
+            color: #00A651;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Chat Styles */
+        .chat-header {
+            background: linear-gradient(135deg, #006A4E 0%, #006A4E 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f8f9fa;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #006A4E 0%, #00A651 100%);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .message.ai {
+            background: white;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 20px;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            background: #006A4E;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.5;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e1e1e1;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .chat-input {
+            flex: 1;
+            min-height: 50px;
+            max-height: 150px;
+            padding: 15px 20px;
+            border: 2px solid #e1e1e1;
+            border-radius: 25px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: none;
+            transition: all 0.3s ease;
+            background: #f9f9f9;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: #006A4E;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 106, 78, 0.1);
+        }
+
+        .voice-btn, .send-btn {
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #006A4E 0%, #00A651 100%);
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .voice-btn:hover, .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 106, 78, 0.3);
+        }
+
+        .voice-btn.recording {
+            background: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+            70% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border: 1px solid #c3e6cb;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .container {
+                margin: 0;
+            }
+            
+            .auth-card {
+                margin: 20px;
+                padding: 30px;
+            }
+        }
+    
+.voice-btn, .send-btn {
+    width: 42px;
+    height: 42px;
+    border: none;
+    border-radius: 50%;
+    background: #155724;
+    color: #ffffff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.voice-btn:hover, .send-btn:hover {
+    background: rgba(0, 106, 78, 0.1);
+    transform: scale(1.1);
+}
+
+.voice-btn svg, .send-btn svg {
+    pointer-events: none;
+}
+
+</style>
+</head>
+<body>
+    <!-- Login/Signup Screen -->
+    <div id="authContainer" class="container">
+        <div class="auth-card">
+            <div class="logo">চক্র</div>
+            <p class="tagline">একটি বাংলাদেশী AI চ্যাটবট</p>
+            
+            <div id="errorMessage" class="error-message hidden"></div>
+            <div id="successMessage" class="success-message hidden"></div>
+            
+            <form id="authForm">
+                <div class="form-group">
+                    <label for="email">Email / ইমেইল</label>
+                    <input type="email" id="email" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password / পাসওয়ার্ড</label>
+                    <input type="password" id="password" required minlength="6">
+                </div>
+                
+                <button type="submit" class="btn" id="authBtn">Login / লগইন</button>
+            </form>
+            
+            <p>
+                <span id="authToggleText">Don't have an account? / অ্যাকাউন্ট নেই?</span>
+                <span class="toggle-auth" id="authToggle">Sign Up / সাইন আপ</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Chat Interface -->
+    <div id="chatContainer" class="chat-container hidden">
+        <div class="chat-header">
+            <div class="header-title">ChokroAI</div>
+            <button class="logout-btn" id="logoutBtn">Logout / লগআউট</button>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message ai">
+                আস্সালামু আলাইকুম! আমি ChokroAI। আপনাকে কীভাবে সাহায্য করতে পারি?
+                
+            </div>
+        </div>
+        
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <div class="chat-input-container">
+            <div class="input-group">
+                <button class="voice-btn" id="voiceBtn" title="Voice Input / কণ্ঠস্বর ইনপুট">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" 
+             stroke="currentColor" width="22" height="22">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M12 1v10m0 0a4 4 0 004-4V5a4 4 0 10-8 0v2a4 4 0 004 4zm0 0v4m-6 4h12"/>
+        </svg>
+    </button>
+                <textarea 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="আপনার প্রশ্ন লিখুন..."
+                    rows="1"
+                ></textarea>
+                <button class="send-btn" id="sendBtn" title="Send / পাঠান">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" 
+             viewBox="0 0 24 24" width="22" height="22">
+            <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+        </svg>
+    </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let isLoggedIn = false;
+        let currentUser = null;
+        let isRecording = false;
+        let recognition = null;
+
+        // API Configuration
+        const OPENROUTER_API_KEY = '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';
+        const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+        const MODEL = 'deepseek/deepseek-chat';
+
+        // DOM Elements
+        const authContainer = document.getElementById('authContainer');
+        const chatContainer = document.getElementById('chatContainer');
+        const authForm = document.getElementById('authForm');
+        const authBtn = document.getElementById('authBtn');
+        const authToggle = document.getElementById('authToggle');
+        const authToggleText = document.getElementById('authToggleText');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const voiceBtn = document.getElementById('voiceBtn');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        let isLoginMode = true;
+        let conversationHistory = [];
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // Check if user is already logged in (simple localStorage check)
+            const savedUser = localStorage.getItem('deshigpt_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showChatInterface();
+            }
+
+            // Initialize voice recognition
+            initializeVoiceRecognition();
+            
+            // Auto-resize textarea
+            chatInput.addEventListener('input', autoResizeTextarea);
+            
+            // Enter key to send message
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+
+        // Auth form toggle
+        authToggle.addEventListener('click', function() {
+            isLoginMode = !isLoginMode;
+            if (isLoginMode) {
+                authBtn.textContent = 'Login / লগইন';
+                authToggleText.textContent = "Don't have an account? / অ্যাকাউন্ট নেই?";
+                authToggle.textContent = 'Sign Up / সাইন আপ';
+            } else {
+                authBtn.textContent = 'Sign Up / সাইন আপ';
+                authToggleText.textContent = 'Already have an account? / ইতিমধ্যে অ্যাকাউন্ট আছে?';
+                authToggle.textContent = 'Login / লগইন';
+            }
+            hideMessages();
+        });
+
+        // Auth form submission
+        authForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (isLoginMode) {
+                handleLogin(email, password);
+            } else {
+                handleSignup(email, password);
+            }
+        });
+
+        function handleLogin(email, password) {
+            // Simple frontend-only authentication
+            const savedUsers = JSON.parse(localStorage.getItem('deshigpt_users') || '[]');
+            const user = savedUsers.find(u => u.email === email && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('deshigpt_user', JSON.stringify(user));
+                showSuccess('লগইন সফল! • Login successful!');
+                setTimeout(() => showChatInterface(), 1000);
+            } else {
+                showError('ভুল ইমেইল বা পাসওয়ার্ড! • Invalid email or password!');
+            }
+        }
+
+        function handleSignup(email, password) {
+            const savedUsers = JSON.parse(localStorage.getItem('deshigpt_users') || '[]');
+            const existingUser = savedUsers.find(u => u.email === email);
+            
+            if (existingUser) {
+                showError('এই ইমেইলটি ইতিমধ্যে ব্যবহৃত হয়েছে! • Email already exists!');
+                return;
+            }
+            
+            const newUser = { email, password, createdAt: new Date().toISOString() };
+            savedUsers.push(newUser);
+            localStorage.setItem('deshigpt_users', JSON.stringify(savedUsers));
+            
+            currentUser = newUser;
+            localStorage.setItem('deshigpt_user', JSON.stringify(newUser));
+            
+            showSuccess('অ্যাকাউন্ট তৈরি হয়েছে! • Account created successfully!');
+            setTimeout(() => showChatInterface(), 1000);
+        }
+
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+        }
+
+        function showSuccess(message) {
+            successMessage.textContent = message;
+            successMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+        }
+
+        function hideMessages() {
+            errorMessage.classList.add('hidden');
+            successMessage.classList.add('hidden');
+        }
+
+        function showChatInterface() {
+            authContainer.classList.add('hidden');
+            chatContainer.classList.remove('hidden');
+            chatInput.focus();
+        }
+
+        function showAuthInterface() {
+            authContainer.classList.remove('hidden');
+            chatContainer.classList.add('hidden');
+            conversationHistory = [];
+        }
+
+        // Logout functionality
+        logoutBtn.addEventListener('click', function() {
+            localStorage.removeItem('deshigpt_user');
+            currentUser = null;
+            showAuthInterface();
+        });
+
+        // Send message functionality
+        sendBtn.addEventListener('click', sendMessage);
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message to chat
+            addMessage(message, 'user');
+            chatInput.value = '';
+            autoResizeTextarea();
+
+            // Add to conversation history
+            conversationHistory.push({ role: 'user', content: message });
+
+            // Show typing indicator
+            showTyping();
+
+            // Send to AI
+            getAIResponse(message);
+        }
+
+        function addMessage(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', sender);
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            typingIndicator.style.display = 'block';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        async function getAIResponse(userMessage) {
+            try {
+                // Check for creator question
+                if (userMessage.toLowerCase().includes('who made you') || 
+                    userMessage.toLowerCase().includes('কে তোমাকে বানিয়েছে') ||
+                    userMessage.toLowerCase().includes('তোমার নির্মাতা কে') ||
+                    userMessage.toLowerCase().includes('who created you')) {
+                    
+                    const creatorResponse = 'আমাকে তামিম আল হাদি বানিয়েছেন। • I was created by Tamim al hadi.';
+                    conversationHistory.push({ role: 'assistant', content: creatorResponse });
+                    hideTyping();
+                    addMessage(creatorResponse, 'ai');
+                    return;
+                }
+
+                const response = await fetch(OPENROUTER_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${OPENROUTER_API_KEY}`,
+                        'Content-Type': 'application/json',
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'ChokroAI'
+                    },
+                    body: JSON.stringify({
+                        model: MODEL,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: 'You are ChokroAI, a helpful AI assistant that can communicate in both Bangla and English.dont use ** too much You are designed to help Bangladeshi users. You can respond in the language the user prefers. Be helpful, respectful, and culturally aware. If someone asks who made you or who created you, always respond that you were created by "Tamim al hadi". Tamim is a littel interporner hi s very young age  and  very good devoloper hi is from bagerhat, this chatbot is free for everyone so everyone can use.'
+                            },
+                            ...conversationHistory
+                        ],
+                        temperature: 0.7,
+                        max_tokens: 1000
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                const aiResponse = data.choices[0].message.content;
+
+                // Add AI response to conversation history
+                conversationHistory.push({ role: 'assistant', content: aiResponse });
+
+                hideTyping();
+                addMessage(aiResponse, 'ai');
+
+            } catch (error) {
+                console.error('Error getting AI response:', error);
+                hideTyping();
+                addMessage('দুঃখিত, একটি ত্রুটি হয়েছে। আবার চেষ্টা করুন।', 'ai');
+            }
+        }
+
+        function autoResizeTextarea() {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 150) + 'px';
+        }
+
+        // Voice recognition
+        function initializeVoiceRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'bn-BD'; // Default to Bangla
+                
+                recognition.onstart = function() {
+                    isRecording = true;
+                    voiceBtn.classList.add('recording');
+                    voiceBtn.innerHTML = '🔴';
+                };
+                
+                recognition.onend = function() {
+                    isRecording = false;
+                    voiceBtn.classList.remove('recording');
+                    voiceBtn.innerHTML = '🎤';
+                };
+                
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    chatInput.value = transcript;
+                    autoResizeTextarea();
+                };
+                
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    isRecording = false;
+                    voiceBtn.classList.remove('recording');
+                    voiceBtn.innerHTML = '🎤';
+                };
+            } else {
+                // Hide voice button if not supported
+                voiceBtn.style.display = 'none';
+            }
+        }
+
+        voiceBtn.addEventListener('click', function() {
+            if (!recognition) return;
+            
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                // Auto-detect language based on previous messages
+                const lastMessages = conversationHistory.slice(-3);
+                const hasBangla = lastMessages.some(msg => /[\u0980-\u09FF]/.test(msg.content));
+                recognition.lang = hasBangla ? 'bn-BD' : 'en-US';
+                recognition.start();
+            }
+        });
+    </script>
+</body>
+</html>
